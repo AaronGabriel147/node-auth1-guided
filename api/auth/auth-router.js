@@ -16,12 +16,14 @@ router.post('/register', validatePayload, async (req, res, next) => {
         const createdUser = await add(user)
         console.log(createdUser)
         res.status(201).json(createdUser)
-    } catch (error) {
-        next(error);
+    } catch (err) {
+        next(err);
     }
 })
 
+// ____________________________________________________________________________
 
+// Check is user exists by hash
 // The if statement && section is referencing the console.log that looks like this:
 //   [
 //     {
@@ -32,39 +34,68 @@ router.post('/register', validatePayload, async (req, res, next) => {
 //   ]
 // existing can be refactored to: [user] but it can be dangerous to use because sometimes it will not be an array. 
 
+// *** 
+
+// Session
+// console.log(req.session) is how you test if the express-session is working and the config is working. Console looks like:
+// Session {
+//     cookie: {
+//       path: '/',
+//       _expires: 2021-12-04T02:43:20.259Z,
+//       originalMaxAge: 604800000,
+//       httpOnly: false,
+//       secure: false
+//     }
+//   }
+
 router.post('/login', async (req, res, next) => {
     try {
         const { username, password } = req.body;
-        const existing = await findBy({ username }) // This is the user from the database.
-        if (existing.length && bcrypt.compareSync(password, existing[0].password)) { // bcrypt line is testing the decrypted pw
-            console.log('existing --->', existing) // user is being retrieved from db with decrypted password
-            console.log(req.session)
-            // res.status(200).json({
-            //     message: `Welcome ${existing.username}!`
-            // })
+        const [user] = await findBy({ username }) // This is the user from the database.
+        if (user && bcrypt.compareSync(password, user.password)) { // bcrypt line is testing the decrypted pw
+            console.log(req.session) // user is being retrieved from db with decrypted password
+            req.session.user = user // A cookie will be set on response. The session will be stored in the server. // In Insomnia click Headers to see set cookie.
+            console.log('user ---->', user)
+            return res.json({ message: `You are logged in ${username}, have a cookie!` })
         }
-
-        next({ status: 401, message: 'Invalid Credentials' }); // Sometimes this needs a return in front of it.
-
-        // else {
-        //     res.status(401).json({ message: 'Invalid Credentials' });
-        // }
-
-        // else {
-        //     next({ status: 401, message: 'Invalid Credentials' });
-        // }
-
-
-    } catch (error) { // ask for a 1 line version
-        next(error);
+        next({ status: 401, message: 'Invalid Credentials from login 401 else statement' }); // Sometimes this needs a return in front of it.
+    } catch (err) {
+        next(err);
     }
 });
+
+// There are at least 3 ways you can write your 400 error message.***
+// else {
+//     res.status(401).json({ message: 'Invalid Credentials' });
+// }
+
+// else {
+//     next({ status: 401, message: 'Invalid Credentials' });
+// }
+
+
+
+
+
+
+
 
 
 
 router.get('/logout', async (req, res, next) => {
-    res.json('register wired!')
+    try {
+        if (req.session.user) {
+            req.session.destroy(() => { // This is the session.destroy() method.
+                res.status(200).json({ message: 'Logged Out' })
+            })
+        }
+        next({ status: 401, message: 'Not logged in' })
+    } catch (err) {
+        next(err);
+    }
 })
+
+
 
 
 module.exports = router;

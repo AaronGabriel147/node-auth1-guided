@@ -4,7 +4,7 @@ const helmet = require('helmet')
 
 const session = require('express-session') // session*************************
 
-const usersRouter = require('./users/users-router.js')
+const usersRouter = require('./users/users-router')
 const authRouter = require('./auth/auth-router')
 const server = express()
 
