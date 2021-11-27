@@ -1,3 +1,15 @@
+My notes: 
+
+npm i 
+
+
+
+
+
+
+
+// ________________________________________
+
 # Node Auth 1 Guided Project
 
 Guided project for **Node Auth 1** Module.
