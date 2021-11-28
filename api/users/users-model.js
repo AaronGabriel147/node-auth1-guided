@@ -1,20 +1,19 @@
 const db = require('../../database/db-config.js')
 
 module.exports = {
-  getAll,
   add,
   find,
   findBy,
   findById,
 }
 
-function getAll() {
-  console.log('getAll')
-  return db('users')
-}
+// function getAll() {
+//   console.log('getAll')
+//   return db('users')
+// }
 
 function find() {
-  return db('users').select('id', 'username')
+  return db('users').select('id', 'username').orderBy('id')
 }
 
 function findBy(filter) {

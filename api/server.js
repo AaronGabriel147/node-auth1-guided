@@ -19,7 +19,7 @@ server.use(session({                      // session config ********************
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7, // cookie will expire in 7 days
     secure: false, // cookie will only be sent over https, in prod this should be true
-    httpOnly: false, // JS reading cookie ?
+    httpOnly: true, // JS reading cookie ?
   },
   rolling: true, // session will be renewed every time the user makes a request
   resave: false, // session will not be saved if it is not modified
